@@ -12,7 +12,6 @@ imagenes_comprimidas = []
 escala = 2
 calidad = 40
 
-
 """
 Extraer paginas como imagenes
 """
