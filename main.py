@@ -10,12 +10,13 @@ carpeta_comprimidos = Path("comprimidos")
 imagenes = []
 imagenes_comprimidas = []
 escala = 2
-calidad = 40
+calidad = 50
 
 """
 Extraer paginas como imagenes
 """
 def extrarPaginas(nombre_pdf, nombre_pdf_sin_extension):
+    print(f"Extrayendo imagenes de {nombre_pdf}...")
     pdf = pdfium.PdfDocument(f"{carpeta_pdf}/{nombre_pdf}")
     cantidad_paginas = len(pdf)
     for indice_pagina in range(cantidad_paginas):
@@ -73,6 +74,10 @@ def eliminarImagenes():
     for imagen in imagenes + imagenes_comprimidas:
         os.remove(imagen)
 
+def eliminar_pdfs(nombre_pdf):
+    print("Eliminando PDF original...")
+    os.remove(f"{carpeta_pdf}/{nombre_pdf}")
+
 #FIN DE LA FUNCION ELIMINAR IMAGENES
 
 for archivo in carpeta_pdf.iterdir():
@@ -86,3 +91,6 @@ for archivo in carpeta_pdf.iterdir():
         crearPDFComprimido(nombre_pdf_comprimido)
         moverPDFComprimido(nombre_pdf_comprimido)
         eliminarImagenes()
+        eliminar_pdfs(archivo.name)
+        imagenes = []
+        imagenes_comprimidas = []
