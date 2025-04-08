@@ -4,13 +4,26 @@ from PIL import Image
 import img2pdf
 import os
 import shutil
+import random
 
 carpeta_pdf = Path("pdfs")
 carpeta_comprimidos = Path("comprimidos")
 imagenes = []
 imagenes_comprimidas = []
 escala = 2
-calidad = 50
+calidad = 1
+numeros_calidad = list(range(1, 10))
+numero_anterior = 0
+
+def numero_aleatorio():
+    global calidad
+    numero_anterior = calidad
+    calidad = random.sample(numeros_calidad, 2)
+    if calidad[0] == numero_anterior:
+        calidad = calidad[1] * 10
+    else:
+        calidad = calidad[0] * 10
+    print(f"El numero es {calidad}")
 
 """
 Extraer paginas como imagenes
@@ -42,6 +55,7 @@ def comprimirImagenes():
         nombre_imagen_salida = nombre_imagen_sin_extension + \
             "_comprimida" + nombre_imagen[nombre_imagen.rfind("."):]
         imagen = Image.open(nombre_imagen)
+        numero_aleatorio()
         imagen.save(nombre_imagen_salida, optimize=True, quality=calidad)
         imagenes_comprimidas.append(nombre_imagen_salida)
 
@@ -74,11 +88,22 @@ def eliminarImagenes():
     for imagen in imagenes + imagenes_comprimidas:
         os.remove(imagen)
 
-def eliminar_pdfs(nombre_pdf):
+def eliminar_pdfs(carpeta, nombre_pdf):
     print("Eliminando PDF original...")
-    os.remove(f"{carpeta_pdf}/{nombre_pdf}")
+    os.remove(f"{carpeta}/{nombre_pdf}")
 
 #FIN DE LA FUNCION ELIMINAR IMAGENES
+
+
+#Eliminar Archivos Comprimidos
+def eliminar_pdfs_comprimidos():
+    for archivo in carpeta_comprimidos.iterdir():
+        if archivo.is_file():
+            print(f"Eliminando comprimido {archivo.name}...")
+            eliminar_pdfs(carpeta_comprimidos, archivo.name)
+#FIN FUNCION ELIMINAR PDF COMPRIMIDOS
+
+eliminar_pdfs_comprimidos()
 
 for archivo in carpeta_pdf.iterdir():
     if archivo.is_file():
@@ -91,6 +116,6 @@ for archivo in carpeta_pdf.iterdir():
         crearPDFComprimido(nombre_pdf_comprimido)
         moverPDFComprimido(nombre_pdf_comprimido)
         eliminarImagenes()
-        eliminar_pdfs(archivo.name)
+        eliminar_pdfs(carpeta_pdf, archivo.name)
         imagenes = []
         imagenes_comprimidas = []
